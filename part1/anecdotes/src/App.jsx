@@ -15,12 +15,24 @@ const App = () => {
   const [selected, setSelected] = useState(0)
   const [votes, setVotes] = useState({});
 
+  let maxVoteKey;
+  if(votes.length === 0) {
+    maxVoteKey = 0;
+  }
+  else {
+    maxVoteKey = Object.keys(votes).reduce((acc, obj) => votes[acc] > votes[obj] ? acc : obj, 0);
+  }
+
   return (
     <div>
+      <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}</p>
-      <p>has {votes.selected === undefined ? 0 : votes.selected} votes</p>
+      <p>has {votes[selected] === undefined ? 0 : votes[selected]} votes</p>
       <button onClick={() => setSelected(Math.floor(Math.random() * anecdotes.length))}>next anecdote</button>
-      <button onClick={() => setVotes({...votes, selected:votes.selected === undefined ? 1 : votes.selected+1})}>vote</button>
+      <button onClick={() => setVotes({...votes, [selected]:votes[selected] === undefined ? 1 : votes[selected]+1})}>vote</button>
+      <h1>Anecdote with most votes</h1>
+      <p>{anecdotes[maxVoteKey]}</p>
+      <p>has {votes[maxVoteKey] === undefined ? 0 : votes[maxVoteKey]} votes</p>
     </div>
   )
 }
