@@ -26,26 +26,34 @@ const App = () => {
     event.preventDefault();
 
     // Check for duplicate names by looping through array to see if it finds a similar name
-    if(persons.some(person => {
-      return person.name === newName;
-    })) {
-      alert(`${newName} is already added to phonebook`);
+    const foundPerson = persons.find(person => person.name === newName);
+    if(foundPerson) {
+      if(foundPerson.number !== newPhone) {
+        if(!window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+          return;
+        }
+          const changedPerson = { ...foundPerson, number: newPhone };
+          phonebookService.update(foundPerson.id, changedPerson)
+          .then(returnedPerson => {
+            console.log('Updated', returnedPerson);
+            setPersons(persons.map(person => person.id !== foundPerson.id ? person : returnedPerson));
+          });
+      } else {
+        alert(`${newName} is already added to phonebook`);
+      }
+
       return;
     }
 
     const nameObj = {
       name: newName,
       number: newPhone,
-      id: persons.length + 1
+      id: persons.reduce((acc, person) => Math.max(acc, person.id), 0) + 1 + ""
     };
     setPersons(persons.concat(nameObj));
     setNewName('');
     setNewPhone('');
 
-    // axios.post('http://localhost:3001/persons', nameObj)
-    //   .then(response => {
-    //     console.log('Added', response.data);
-    //   });
     phonebookService.create(nameObj)
     .then(returnedPerson => {
       console.log('Added', returnedPerson);
@@ -61,17 +69,14 @@ const App = () => {
   }
 
   const handleNameChange = (event) => {
-    //console.log(event.target.value);
     setNewName(event.target.value);
   }
 
   const handlePhoneChange = (event) => {
-    //console.log(event.target.value);
     setNewPhone(event.target.value);
   }
 
   const handleFilterChange= (event) => {
-    //console.log(event.target.value);
     setFilter(event.target.value);
   }
 
