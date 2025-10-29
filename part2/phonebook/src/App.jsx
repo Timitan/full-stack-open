@@ -15,7 +15,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [filter, setFilter] = useState('')
-  const [notification, setNotification] = useState('')
+  const [notifTimeout, setNotifTimeout] = useState(null)
+  const [notification, setNotification] = useState({message: '', isError: false})
 
   useEffect(() => {
     phonebookService.getAll()
@@ -39,6 +40,10 @@ const App = () => {
           .then(returnedPerson => {
             console.log('Updated', returnedPerson);
             setPersons(persons.map(person => person.id !== foundPerson.id ? person : returnedPerson));
+          })
+          .catch(error => {
+            setNotificationMessage(`Information of ${foundPerson.name} has already been removed from server`, true);
+            setPersons(persons.filter(person => person.id !== foundPerson.id));
           });
       } else {
         alert(`${newName} is already added to phonebook`);
@@ -59,11 +64,21 @@ const App = () => {
     phonebookService.create(nameObj)
     .then(returnedPerson => {
       console.log('Added', returnedPerson);
-      setNotification(`Added ${returnedPerson.name}`);
-      setTimeout(() => {
-        setNotification(null);
-      }, 4000);
+      setNotificationMessage(`Added ${returnedPerson.name}`);
     });
+  }
+
+  const setNotificationMessage = (message, isError = false) => {
+    setNotification({ message, isError });
+    if (notifTimeout) {
+      clearTimeout(notifTimeout);
+    }
+    setNotifTimeout(
+      setTimeout(() => {
+        setNotification({ message: null, isError: false });
+        setNotifTimeout(null);
+      }, 4000)
+    );
   }
 
   const handleNameDelete = (id) => {
@@ -89,7 +104,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification message={notification.message} isError={notification.isError} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
       <h2>Add a new:</h2>
