@@ -1,10 +1,10 @@
 import Country from './Country.jsx';
 
-const Countries = ({countries}) => {
+const Countries = ({countries, handleShow}) => {
     return (
         <ul>
             {countries.map(country => (
-                <Country key={country} name={country} />
+                <Country key={country} name={country} handleShow={handleShow} />
             ))}
         </ul>
     )

@@ -3,6 +3,7 @@ import countryNames from './countryNames.js'
 import Countries from './Countries.jsx'
 import CountryData from './CountryData.jsx'
 import countryService from './countryService.js'
+import weatherService from './weatherService.js'
 
 function App() {
   const [filter, setFilter] = useState('')
@@ -33,6 +34,19 @@ function App() {
     }
   }
 
+  const handleShow = (countryName) => {
+    setFilter(countryName);
+    setCountries([countryName]);
+    countryService.getCountry(countryName).then(data => {
+      console.log(data);
+      setCountryData(data);
+    });
+
+    weatherService.getWeather(data.capital[0]).then(weatherData => {
+      console.log(weatherData);
+    });
+  }
+
   return (
       <div>
         filter shown with: <input value={filter} onChange={handleFilterChange}/>
@@ -41,7 +55,7 @@ function App() {
           <CountryData countryData={countryData} />
           :
           countries.length > 0 ?
-            <Countries countries={countries} />
+            <Countries countries={countries} handleShow={handleShow} />
             : <p>No matches found</p>
           : <p>Too many matches, specify another filter</p>
         }

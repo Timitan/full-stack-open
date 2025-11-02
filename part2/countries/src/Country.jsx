@@ -1,6 +1,9 @@
-const Country = ({name}) => {
+const Country = ({name, handleShow}) => {
     return (
-        <li>{name}</li>
+        <div>
+            <li style={{display: "inline", marginRight: "5px"}}>{name}</li>
+            <button onClick={() => handleShow(name)}>show</button>
+        </div>
     )
 }
 
