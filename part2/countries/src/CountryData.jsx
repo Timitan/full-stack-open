@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 const CountryData = ({countryData}) => {
     if(countryData === undefined || Object.keys(countryData).length === 0) {
         return <p>Loading country data...</p>;

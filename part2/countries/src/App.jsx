@@ -9,6 +9,7 @@ function App() {
   const [filter, setFilter] = useState('')
   const [countries, setCountries] = useState([])
   const [countryData, setCountryData] = useState({})
+  const [weatherData, setWeatherData] = useState({})
 
   // Used for getting a list of country names from the REST Countries API
   // useEffect(() => {
@@ -23,28 +24,48 @@ function App() {
     const value = event.target.value;
     setFilter(value)
     const filteredCountries = countryNames.filter(country => country.toLowerCase().includes(value.toLowerCase()));
+    if(filteredCountries.length == 1 && countries.length == 1 && filteredCountries[0] == countries[0]) {
+      return;
+    }
     setCountries(filteredCountries);
     if(filteredCountries.length === 1) {
-      countryService.getCountry(filteredCountries[0]).then(data => {
-        console.log(data);
-        setCountryData(data);
-      });
+      // countryService.getCountry(filteredCountries[0]).then(data => {
+      //   console.log(data);
+      //   setCountryData(data);
+      // });
+      getData(filteredCountries[0]);
     } else {
       setCountryData({});
+      setWeatherData({});
     }
+  }
+
+  const getData = (countryName) => {
+    countryService.getCountry(countryName)
+    .then(data => {
+      console.log(data);
+      setCountryData(data);
+      return data;
+    })
+    .then((data) => {
+      console.log(data);
+      return weatherService.getWeather(data.capital[0]);
+    })
+    .then((weatherData) => {
+      console.log(weatherData);
+      setWeatherData(weatherData);
+    })
+    .catch((error) => {
+      setCountryData([]);
+      setWeatherData({});
+      console.error('Error fetching data:', error);
+    });
   }
 
   const handleShow = (countryName) => {
     setFilter(countryName);
     setCountries([countryName]);
-    countryService.getCountry(countryName).then(data => {
-      console.log(data);
-      setCountryData(data);
-    });
-
-    weatherService.getWeather(data.capital[0]).then(weatherData => {
-      console.log(weatherData);
-    });
+    getData(countryName);
   }
 
   return (
