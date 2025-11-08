@@ -1,4 +1,6 @@
-const CountryData = ({countryData}) => {
+import WeatherData from "./WeatherData";
+
+const CountryData = ({countryData, weatherData}) => {
     if(countryData === undefined || Object.keys(countryData).length === 0) {
         return <p>Loading country data...</p>;
     }
@@ -15,6 +17,7 @@ const CountryData = ({countryData}) => {
                 ))}
             </ul>
             <img src={countryData.flags.png} alt={`Flag of ${countryData.name.common}`} width="150" />
+            <WeatherData weatherData={weatherData} />
         </div>
     )
 }

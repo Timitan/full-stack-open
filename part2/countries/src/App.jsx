@@ -29,10 +29,6 @@ function App() {
     }
     setCountries(filteredCountries);
     if(filteredCountries.length === 1) {
-      // countryService.getCountry(filteredCountries[0]).then(data => {
-      //   console.log(data);
-      //   setCountryData(data);
-      // });
       getData(filteredCountries[0]);
     } else {
       setCountryData({});
@@ -43,16 +39,15 @@ function App() {
   const getData = (countryName) => {
     countryService.getCountry(countryName)
     .then(data => {
-      console.log(data);
       setCountryData(data);
       return data;
     })
     .then((data) => {
-      console.log(data);
+      //console.log(data);
       return weatherService.getWeather(data.capital[0]);
     })
     .then((weatherData) => {
-      console.log(weatherData);
+      //console.log(weatherData);
       setWeatherData(weatherData);
     })
     .catch((error) => {
@@ -73,7 +68,7 @@ function App() {
         filter shown with: <input value={filter} onChange={handleFilterChange}/>
         {countries.length < 10 ?
           countries.length == 1 ?
-          <CountryData countryData={countryData} />
+          <CountryData countryData={countryData} weatherData={weatherData}/>
           :
           countries.length > 0 ?
             <Countries countries={countries} handleShow={handleShow} />
