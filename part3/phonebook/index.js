@@ -3,6 +3,12 @@ const app = express()
 
 app.use(express.json())
 
+const maxId = 999999;
+
+const getNewId = () => {
+    return Math.floor(Math.random() * maxId + 1);
+}
+
 persons = [
     { 
       "id": "1",
@@ -28,6 +34,34 @@ persons = [
 
 app.get("/api/persons", (request, response) => {
     response.json(persons);
+})
+
+app.post("/api/persons", (request, response) => {
+    const body = request.body;
+    if (!body.name || !body.number) {
+        return response.status(400).json({ 
+            error: 'name or number is missing' 
+        })
+    }
+
+    if (persons.find(person => person.name === body.name)) {
+        return response.status(400).json({
+            error: 'name must be unique'
+        });
+    }
+
+    const person = request.body
+
+    let newId = '';
+    while (newId === '' || persons.find(p => p.id === newId)) {
+        newId = String(getNewId());
+    }
+
+    person.id = String(newId);
+
+    persons = persons.concat(person)
+
+    response.json(person)
 })
 
 app.get("/api/persons/:id", (request, response) => {
