@@ -1,3 +1,13 @@
+###
+GET http://localhost:3001/api/persons/693e007310cf4bf753559596
+
+###
+GET http://localhost:3001/api/persons/invalidId
+
+###
+GET http://localhost:3001/info
+
+###
 DELETE http://localhost:3001/api/persons/1
 
 ###
@@ -8,6 +18,10 @@ content-type: application/json
     "name": "test2",
     "number": "12345"
 }
+
+###
+DELETE http://localhost:3001/api/persons/6941b2c8797e70203f841e8a
+
 
 ###
 POST http://localhost:3001/api/persons HTTP/1.1

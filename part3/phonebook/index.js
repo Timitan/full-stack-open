@@ -2,8 +2,9 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const Person = require('./models/person')
-const { findById, getAllPersons } = require('./models/personGetters')
-const { savePerson, deletePerson } = require('./models/personSetters')
+const { findById, getAllPersons} = require('./models/personGetters')
+const { savePerson, deletePerson, updatePerson} = require('./models/personSetters')
+const { errorHandler } = require('./errorHandler');
 //const cors = require('cors')
 
 const app = express()
@@ -61,31 +62,49 @@ app.post("/api/persons", (request, response) => {
         })
     }
 
-    // Ignore for exercise 3.14
+    const person = request.body
+
+    savePerson(Person, person).then(savedPerson => {
+        response.json(savedPerson)
+    });
+
+    // Local Post
     // if(persons.find(person => person.name === body.name)) {
     //     return response.status(400).json({
     //         error: 'name must be unique'
     //     });
     // }
-
-    const person = request.body
-
-    let newId = '';
-    while (newId === '' || persons.find(p => p.id === newId)) {
-        newId = String(getNewId());
-    }
-
-    person.id = String(newId);
-
-    savePerson(Person, person).then(savedPerson => {
-        response.json(savedPerson)
-    });
+    // let newId = '';
+    // while (newId === '' || persons.find(p => p.id === newId)) {
+    //     newId = String(getNewId());
+    // }
+    // person.id = String(newId);
     // persons = persons.concat(person)
-
     // response.json(person)
 })
 
-app.get("/api/persons/:id", (request, response) => {
+app.put("/api/persons/:id", (request, response, next) => {
+    const id = request.params.id;
+    const body = request.body;
+    const personObj = {
+        name: body.name,
+        number: body.number,
+    };
+
+    if (!body.name || !body.number) {
+        return response.status(400).json({ 
+            error: 'name or number is missing' 
+        })
+    }
+
+    updatePerson(Person, id, personObj)
+        .then(updatedPerson => {
+            response.json(updatedPerson);
+        })
+        .catch(error => next(error));
+})
+
+app.get("/api/persons/:id", (request, response, next) => {
     const id = request.params.id;
 
     findById(Person, id).then(person => {
@@ -95,8 +114,9 @@ app.get("/api/persons/:id", (request, response) => {
             // bad request
             response.status(404).end()
         }
-    });
+    }).catch(error => next(error));
 
+    // Local Get
     // const person = persons.find(person => person.id === id);
     // if (person) {
     //     response.json(person);
@@ -106,11 +126,13 @@ app.get("/api/persons/:id", (request, response) => {
     // }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     deletePerson(Person, id).then(() => {
         response.status(204).end()
-    });
+    }).catch(error => next(error));
+
+    // Local deletion
     // persons = persons.filter(person => person.id !== id)
     // response.status(204).end()
 })
@@ -122,6 +144,8 @@ app.get("/info", (request, response) => {
         response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`)
     )
 })
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {

@@ -12,4 +12,13 @@ const deletePerson = (Person, id) => {
     return Person.findByIdAndDelete(id)
 }
 
-module.exports = { savePerson, deletePerson };
+const updatePerson = (Person, id, personObj) => {
+    return Person.findById(id)
+        .then(person => {
+            person.name = personObj.name;
+            person.number = personObj.number;
+            return person.save();
+        });
+}
+
+module.exports = { savePerson, deletePerson, updatePerson };

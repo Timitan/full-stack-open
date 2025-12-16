@@ -6,4 +6,4 @@ const getAllPersons = (Person) => {
     return Person.find({})
 }
 
-module.exports = { findById, getAllPersons };
+module.exports = { findById, getAllPersons};
