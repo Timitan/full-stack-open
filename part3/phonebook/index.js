@@ -3,6 +3,7 @@ const express = require('express')
 const morgan = require('morgan')
 const Person = require('./models/person')
 const { findById, getAllPersons } = require('./models/personGetters')
+const { savePerson, deletePerson } = require('./models/personSetters')
 //const cors = require('cors')
 
 const app = express()
@@ -60,11 +61,12 @@ app.post("/api/persons", (request, response) => {
         })
     }
 
-    if(persons.find(person => person.name === body.name)) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        });
-    }
+    // Ignore for exercise 3.14
+    // if(persons.find(person => person.name === body.name)) {
+    //     return response.status(400).json({
+    //         error: 'name must be unique'
+    //     });
+    // }
 
     const person = request.body
 
@@ -75,9 +77,12 @@ app.post("/api/persons", (request, response) => {
 
     person.id = String(newId);
 
-    persons = persons.concat(person)
+    savePerson(Person, person).then(savedPerson => {
+        response.json(savedPerson)
+    });
+    // persons = persons.concat(person)
 
-    response.json(person)
+    // response.json(person)
 })
 
 app.get("/api/persons/:id", (request, response) => {
@@ -102,10 +107,12 @@ app.get("/api/persons/:id", (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id
-  persons = persons.filter(person => person.id !== id)
-
-  response.status(204).end()
+    const id = request.params.id
+    deletePerson(Person, id).then(() => {
+        response.status(204).end()
+    });
+    // persons = persons.filter(person => person.id !== id)
+    // response.status(204).end()
 })
 
 
