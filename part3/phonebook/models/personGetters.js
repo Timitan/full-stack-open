@@ -1,3 +1,5 @@
+const opts = { runValidators: true };
+
 const findById = (Person, id) => {
     return Person.findById(id)
 };

@@ -54,19 +54,19 @@ app.get("/api/persons", (request, response) => {
     })
 })
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
     const body = request.body;
-    if (!body.name || !body.number) {
-        return response.status(400).json({ 
-            error: 'name or number is missing' 
-        })
-    }
+    // if (!body.name || !body.number) {
+    //     return response.status(400).json({ 
+    //         error: 'name or number is missing' 
+    //     })
+    // }
 
     const person = request.body
 
     savePerson(Person, person).then(savedPerson => {
         response.json(savedPerson)
-    });
+    }).catch(error => next(error));
 
     // Local Post
     // if(persons.find(person => person.name === body.name)) {

@@ -55,9 +55,8 @@ const App = () => {
     const nameObj = {
       name: newName,
       number: newPhone,
-      id: persons.reduce((acc, person) => Math.max(acc, person.id), 0) + 1 + ""
+      //id: persons.reduce((acc, person) => Math.max(acc, person.id), 0) + 1 + ""
     };
-    setPersons(persons.concat(nameObj));
     setNewName('');
     setNewPhone('');
 
@@ -65,6 +64,10 @@ const App = () => {
     .then(returnedPerson => {
       console.log('Added', returnedPerson);
       setNotificationMessage(`Added ${returnedPerson.name}`);
+      setPersons(persons.concat(returnedPerson));
+    })
+    .catch(error => {
+      setNotificationMessage(error.response.data.error, true);
     });
   }
 

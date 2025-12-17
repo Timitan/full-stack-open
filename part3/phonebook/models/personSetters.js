@@ -1,3 +1,5 @@
+const opts = { runValidators: true };
+
 const savePerson = (Person, personObj) => {
     const person = new Person({
         name: personObj.name,
