@@ -42,8 +42,10 @@ const App = () => {
             setPersons(persons.map(person => person.id !== foundPerson.id ? person : returnedPerson));
           })
           .catch(error => {
-            setNotificationMessage(`Information of ${foundPerson.name} has already been removed from server`, true);
-            setPersons(persons.filter(person => person.id !== foundPerson.id));
+            //console.log(error);
+            //setNotificationMessage(`Information of ${foundPerson.name} has already been removed from server`, true);
+            //setPersons(persons.filter(person => person.id !== foundPerson.id));
+            setNotificationMessage(error.response.data.error, true);
           });
       } else {
         alert(`${newName} is already added to phonebook`);
