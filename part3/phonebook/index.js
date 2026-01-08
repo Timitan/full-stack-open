@@ -2,147 +2,146 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const Person = require('./models/person')
-const { findById, getAllPersons} = require('./models/personGetters')
-const { savePerson, deletePerson, updatePerson} = require('./models/personSetters')
-const { errorHandler } = require('./errorHandler');
+const { findById, getAllPersons } = require('./models/personGetters')
+const { savePerson, deletePerson, updatePerson } = require('./models/personSetters')
+const { errorHandler } = require('./errorHandler')
 //const cors = require('cors')
 
 const app = express()
 app.use(express.static('dist'))
 //app.use(cors())
 
-morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
+morgan.token('body', function (req, _res) { return JSON.stringify(req.body) })
 
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-const maxId = 999999;
+//const maxId = 999999
+// const getNewId = () => {
+//   return Math.floor(Math.random() * maxId + 1)
+// }
 
-const getNewId = () => {
-    return Math.floor(Math.random() * maxId + 1);
-}
-
-persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-];
-
+// persons = [
+//   {
+//     'id': '1',
+//     'name': 'Arto Hellas',
+//     'number': '040-123456'
+//   },
+//   {
+//     'id': '2',
+//     'name': 'Ada Lovelace',
+//     'number': '39-44-5323523'
+//   },
+//   {
+//     'id': '3',
+//     'name': 'Dan Abramov',
+//     'number': '12-43-234345'
+//   },
+//   {
+//     'id': '4',
+//     'name': 'Mary Poppendieck',
+//     'number': '39-23-6423122'
+//   }
+// ]
 
 
-app.get("/api/persons", (request, response) => {
-    //response.json(persons);
-    getAllPersons(Person).then(persons => {
-        response.json(persons)
+
+app.get('/api/persons', (request, response) => {
+  //response.json(persons);
+  getAllPersons(Person).then(persons => {
+    response.json(persons)
+  })
+})
+
+app.post('/api/persons', (request, response, next) => {
+  //const body = request.body
+  // if (!body.name || !body.number) {
+  //     return response.status(400).json({
+  //         error: 'name or number is missing'
+  //     })
+  // }
+
+  const person = request.body
+
+  savePerson(Person, person).then(savedPerson => {
+    response.json(savedPerson)
+  }).catch(error => next(error))
+
+  // Local Post
+  // if(persons.find(person => person.name === body.name)) {
+  //     return response.status(400).json({
+  //         error: 'name must be unique'
+  //     });
+  // }
+  // let newId = '';
+  // while (newId === '' || persons.find(p => p.id === newId)) {
+  //     newId = String(getNewId());
+  // }
+  // person.id = String(newId);
+  // persons = persons.concat(person)
+  // response.json(person)
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id
+  const body = request.body
+  const personObj = {
+    name: body.name,
+    number: body.number,
+  }
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: 'name or number is missing'
     })
+  }
+
+  updatePerson(Person, id, personObj)
+    .then(updatedPerson => {
+      response.json(updatedPerson)
+    })
+    .catch(error => next(error))
 })
 
-app.post("/api/persons", (request, response, next) => {
-    const body = request.body;
-    // if (!body.name || !body.number) {
-    //     return response.status(400).json({ 
-    //         error: 'name or number is missing' 
-    //     })
-    // }
+app.get('/api/persons/:id', (request, response, next) => {
+  const id = request.params.id
 
-    const person = request.body
-
-    savePerson(Person, person).then(savedPerson => {
-        response.json(savedPerson)
-    }).catch(error => next(error));
-
-    // Local Post
-    // if(persons.find(person => person.name === body.name)) {
-    //     return response.status(400).json({
-    //         error: 'name must be unique'
-    //     });
-    // }
-    // let newId = '';
-    // while (newId === '' || persons.find(p => p.id === newId)) {
-    //     newId = String(getNewId());
-    // }
-    // person.id = String(newId);
-    // persons = persons.concat(person)
-    // response.json(person)
-})
-
-app.put("/api/persons/:id", (request, response, next) => {
-    const id = request.params.id;
-    const body = request.body;
-    const personObj = {
-        name: body.name,
-        number: body.number,
-    };
-
-    if (!body.name || !body.number) {
-        return response.status(400).json({ 
-            error: 'name or number is missing' 
-        })
+  findById(Person, id).then(person => {
+    if (person) {
+      response.json(person)
+    } else {
+      // bad request
+      response.status(404).end()
     }
+  }).catch(error => next(error))
 
-    updatePerson(Person, id, personObj)
-        .then(updatedPerson => {
-            response.json(updatedPerson);
-        })
-        .catch(error => next(error));
-})
-
-app.get("/api/persons/:id", (request, response, next) => {
-    const id = request.params.id;
-
-    findById(Person, id).then(person => {
-        if (person) {
-            response.json(person)
-        } else {
-            // bad request
-            response.status(404).end()
-        }
-    }).catch(error => next(error));
-
-    // Local Get
-    // const person = persons.find(person => person.id === id);
-    // if (person) {
-    //     response.json(person);
-    // } else {
-    //     // bad request
-    //     response.status(404).end();
-    // }
+  // Local Get
+  // const person = persons.find(person => person.id === id);
+  // if (person) {
+  //     response.json(person);
+  // } else {
+  //     // bad request
+  //     response.status(404).end();
+  // }
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
-    const id = request.params.id
-    deletePerson(Person, id).then(() => {
-        response.status(204).end()
-    }).catch(error => next(error));
+  const id = request.params.id
+  deletePerson(Person, id).then(() => {
+    response.status(204).end()
+  }).catch(error => next(error))
 
-    // Local deletion
-    // persons = persons.filter(person => person.id !== id)
-    // response.status(204).end()
+  // Local deletion
+  // persons = persons.filter(person => person.id !== id)
+  // response.status(204).end()
 })
 
 
-app.get("/info", (request, response) => {
-    const date = new Date();
-    getAllPersons(Person).then(persons =>
-        response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`)
-    )
+app.get('/info', (request, response) => {
+  const date = new Date()
+  getAllPersons(Person).then(persons =>
+    response.send(`<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`)
+  )
 })
 
 app.use(errorHandler)
