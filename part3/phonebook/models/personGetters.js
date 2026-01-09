@@ -1,11 +1,11 @@
-const opts = { runValidators: true };
+//const opts = { runValidators: true }
 
 const findById = (Person, id) => {
-    return Person.findById(id)
-};
-
-const getAllPersons = (Person) => {
-    return Person.find({})
+  return Person.findById(id)
 }
 
-module.exports = { findById, getAllPersons};
+const getAllPersons = (Person) => {
+  return Person.find({})
+}
+
+module.exports = { findById, getAllPersons }
