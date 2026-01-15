@@ -94,3 +94,28 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(result, testBlogs[2])
   })
 })
+
+describe('top blogger', () => {
+  test('of empty list is null', () => {
+    const result = listHelper.mostBlogs([])
+    assert.strictEqual(result, null)
+  })
+
+  test('of a list with one blog is that blog', () => {
+    const result = listHelper.mostBlogs(testBlogs.slice(0,1))
+    const topBlogger = {
+      author: "Michael Chan",
+      blogs: 1
+    }
+    assert.deepStrictEqual(result, topBlogger)
+  })
+
+  test('of a filled list', () => {
+    const result = listHelper.mostBlogs(testBlogs)
+    const topBlogger = {
+      author: "Robert C. Martin",
+      blogs: 3
+    }
+    assert.deepStrictEqual(result, topBlogger)
+  })
+})
