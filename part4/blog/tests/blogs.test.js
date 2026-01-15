@@ -2,15 +2,7 @@ const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const listHelper = require('../utils/list_helper')
 
-test('dummy returns one', () => {
-  const blogs = []
-
-  const result = listHelper.dummy(blogs)
-  assert.strictEqual(result, 1)
-})
-
-describe('total likes', () => {
-    const blogs = [
+const testBlogs = [
     {
         _id: "5a422a851b54a676234d17f7",
         title: "React patterns",
@@ -61,18 +53,44 @@ describe('total likes', () => {
     }  
 ]
 
+test('dummy returns one', () => {
+  const blogs = []
+
+  const result = listHelper.dummy(blogs)
+  assert.strictEqual(result, 1)
+})
+
+describe('total likes', () => {
   test('of empty list is zero', () => {
     const result = listHelper.totalLikes([])
     assert.strictEqual(result, 0)
   })
 
-test('of a list with one blog is calculated right', () => {
-    const result = listHelper.totalLikes(blogs.slice(0,1))
-    assert.strictEqual(result, 7)
+  test('of a list with one blog is calculated right', () => {
+      const result = listHelper.totalLikes(testBlogs.slice(0,1))
+      assert.strictEqual(result, 7)
   })
 
   test('of filled list is calculated right', () => {
-    const result = listHelper.totalLikes(blogs)
+    const result = listHelper.totalLikes(testBlogs)
     assert.strictEqual(result, 36)
+  })
+})
+
+describe('favorite blog', () => {
+  test('of empty list is null', () => {
+    const result = listHelper.favoriteBlog([])
+    assert.strictEqual(result, null)
+  })
+
+  test('of a list with one blog is that blog', () => {
+    const result = listHelper.favoriteBlog(testBlogs.slice(0,1))
+    assert.deepStrictEqual(result, testBlogs[0])
+  })
+
+  test('of a filled list', () => {
+    const result = listHelper.favoriteBlog(testBlogs)
+    console.log("result:", result)
+    assert.deepStrictEqual(result, testBlogs[2])
   })
 })
